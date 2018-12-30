@@ -1,6 +1,5 @@
 (ns clj-graphql.core
-  (:require [clojure.string :as str]
-            [clj-graphql.types :as types]))
+  (:require [clj-graphql.types :as types]))
 
 (defrecord Field [field-name args])
 (defrecord On [type-name])
@@ -25,52 +24,6 @@
                    (if (and (not (record? v)) (map? v))
                      (prepare-query v)
                      v)]) query-map)))
-
-
-(defn render-args [args]
-  (str "("
-       (str/join (drop-last 2
-                            (reduce (fn [acc [arg-name arg-var]]
-                                      (str acc (name arg-name) ": $" (name arg-var) ", ")) "" args)))
-       ")"))
-
-(defn render-field [field]
-  (cond
-    (instance? Field field)
-    (if-let [args (:args field)]
-      (str (name (:field-name field)) (render-args args))
-      (str (name (:field-name field))))
-
-    (instance? On field)
-    (str "... on " (name (:type-name field)))))
-
-(defn render-value [value]
-  )
-
-(defn render-query [query-map]
-  (reduce
-    (fn [acc [field-k field-v]]
-      (if (and (not (record? field-v)) (map? field-v))
-        (str acc " " (render-field field-k) " {" (render-query field-v) " }")
-        (str acc " " (render-field field-k))))
-    ""
-    query-map))
-
-(defn render-variables [vars]
-  (str "("
-       (str/join (drop-last 2
-                            (reduce (fn [acc [var-name var-type]]
-                                      (str acc "$" (name var-name) ": " (name var-type) ", ")) "" vars)))
-       ")"))
-
-(defn to-graphql [graphql-definition]
-  (str (name (:type graphql-definition))
-       " "
-       (name (:operation-name graphql-definition))
-       (render-variables (:variables graphql-definition))
-       " {"
-       (render-query (:query graphql-definition))
-       " } "))
 
 ;; DSL
 
@@ -100,7 +53,7 @@
   {(field :customer {:id customer-id})
    {(field :name) types/Str
     (field :type) types/Str
-    (field :loan {:name :loanId})
+    (field :loan {:name loanId})
                   {(field :amount) types/Int}
     (on :NewCustomer)
                   {(field :age) types/Int}}})

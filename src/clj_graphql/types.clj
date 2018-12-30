@@ -12,8 +12,8 @@
   GraphQLType
   (schema [this] (apply s/enum values)))
 
-(defn list [type] (with-meta type {:graphql.type/list true}))
-(defn maybe [type] (with-meta type {:graphql.type/maybe true}))
+(defn list [type] (vary-meta type merge {:graphql.type/list true}))
+(defn maybe [type] (vary-meta type merge {:graphql.type/maybe true}))
 
 (def Str (->GraphQLScalar :String s/Str))
 (def ID (->GraphQLScalar :ID s/Str))
